@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
 
         const salt = await bcryptjs.genSalt(10);
         const hash = await bcryptjs.hash(req.body.password, salt);
-		const email = req.body.email;
+        const email = req.body.email;
 
         const newUser = await collection.insertOne({
             email: req.body.email,
@@ -43,12 +43,54 @@ router.post('/register', async (req, res) => {
         const authtoken = jwt.sign(payload, JWT_SECRET);
 
         logger.info('User registered successfully');
-        res.json({authtoken,email});
+        res.json({ authtoken, email });
     } catch (e) {
         return res.status(500).send('Internal server error');
-   }
+    }
 
 
 })
+
+router.post('/login', async (req, res) => {
+    try {
+        const db = await connectToDatabase();
+
+        const collection = db.collection("users");
+
+        const theUser = await collection.findOne({ email: req.body.email });
+
+        if (theUser) {
+            let result = await bcryptjs.compare(req.body.password, theUser.password)
+            if (!result) {
+                logger.error('Passwords do not match');
+                return res.status(404).json({ error: 'Wrong pasword' });
+            }
+            const userName = theUser.firstName;
+            const userEmail = theUser.email;
+
+            let payload = {
+                user: {
+                    id: theUser._id.toString(),
+                },
+            }
+
+            const authtoken = jwt.sign(payload, JWT_SECRET);
+            logger.info('User logged in successfully');
+            return res.status(200).json({ authtoken, userName, userEmail });
+
+
+        } else {
+            logger.error('User not found');
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Task 7: Send appropriate message if user not found
+    } catch (e) {
+        logger.error(e);
+        return res.status(500).send('Internal server error');
+
+    }
+});
+
 
 module.exports = router;
