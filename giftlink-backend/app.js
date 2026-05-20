@@ -24,7 +24,7 @@ connectToDatabase().then(() => {
 app.use(express.json());
 
 // Route files
-const giftRoutes = require('./routes/giftRoutes')
+const giftRoutes = require('./routes/giftRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const authRoutes = require('./routes/authRoutes');
 
@@ -36,12 +36,12 @@ app.use(pinoHttp({ logger }));
 
 // Use Routes
 // Gift API Task 2: add the giftRoutes to the server by using the app.use() method.
-app.use('/api/gifts', giftRoutes)
+app.use('/api/gifts', giftRoutes);
 
 app.use('/api/auth', authRoutes);
 
 // Search API Task 2: add the searchRoutes to the server by using the app.use() method.
-app.use('/api/search', searchRoutes)
+app.use('/api/search', searchRoutes);
 
 
 
@@ -52,8 +52,8 @@ app.use((err, req, res, next) => {
 });
 
 app.get("/",(req,res)=>{
-    res.send("Inside the server")
-})
+    res.send("Inside the server");
+});
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
